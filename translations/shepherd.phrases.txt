@@ -1,0 +1,14 @@
+"Phrases"
+{
+	"Not Inside Trigger"
+	{
+		"en"	"You are not in an area that requires other players."
+		"es"	"No estás en un área que requiera a otros jugadores."
+	}
+	"Absent Players"
+	{
+		"#format"	"{1:d},{2:s}"
+		"en"	"Absent players ({1}): {2}"
+		"es"	"Jugadores ausentes ({1}): {2}"
+	}
+}
