@@ -20,6 +20,18 @@ This plugin adds commands to deal with situations where players are missing from
 
 - `sm_checkpoints`: Toggles displaying all mandatory checkpoints along with their IDs on the screen. This can help with [Automation](#Automation).
 
+## ConVars
+
+ConVars can be configured in `cfg/sourcemod/shepherd.cfg`:
+
+- `sm_shepherd_ultimatum_sound`: Specifies the sound file to be played during an ultimatum.
+
+- `sm_shepherd_ultimatum_default_action`: Sets the default action to be taken on missing players when no action type is specified via a command. Defaults to `"tp"` (teleport).
+
+- `sm_shepherd_ultimatum_default_seconds`: Specifies the default waiting time, in seconds, for missing players when no duration is specified via a command. Defaults to `120` seconds.
+
+- `sm_shepherd_highlight_checkpoints`: Determines whether to highlight checkpoints during ultimatums. Defaults to `1` (enabled).
+
 ## Automation
 
 The plugin can automatically issue ultimatums for certain checkpoints when they are reached for the first time. 
