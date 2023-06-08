@@ -7,6 +7,9 @@
 #pragma newdecls required
 
 #define PLUGIN_PREFIX	"[Shepherd] "
+#define PLUGIN_DESCRIPTION "Helps round progression by tracking and managing missing players"
+#define PLUGIN_VERSION "1.0.0"
+
 #define MAX_EDICTS		(1 << 11)
 
 #define OBS_MODE_IN_EYE 4
@@ -31,9 +34,9 @@ public Plugin myinfo =
 {
 	name		= "Shepherd",
 	author		= "Dysphie",
-	description = "Helps round progression by tracking and managing missing players",
-	version		= "1.0.0",
-	url			= ""
+	description = PLUGIN_DESCRIPTION,
+	version		= PLUGIN_VERSION,
+	url			= "https://github.com/dysphie/nmrih-shepherd"
 };
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
@@ -93,6 +96,9 @@ public void OnPluginStart()
 
 	cvHighlightTrigger = CreateConVar("sm_shepherd_highlight_bounds", "1",
 									  "Whether to highlight the checkpoint's bounding box during ultimatums");
+
+	CreateConVar("shepherd_version", PLUGIN_VERSION, PLUGIN_DESCRIPTION,
+    	FCVAR_SPONLY|FCVAR_NOTIFY|FCVAR_DONTRECORD);
 
 	RegConsoleCmd("sm_missing", Cmd_Missing, "Displays the names of players who are absent from areas that require the whole team");
 

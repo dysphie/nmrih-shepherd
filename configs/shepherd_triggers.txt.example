@@ -1,0 +1,6 @@
+// Kill players who aren't in the elevator after 1 minute
+nmo_ghostbuster 473061 60 kill 
+
+// Teleport lost players to the lifts after 2 minutes
+nmo_ishimura_task_v1_3 865320 120 tp
+nmo_ishimura_task_v1_3 865346 120 tp
