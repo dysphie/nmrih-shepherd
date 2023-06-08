@@ -1,0 +1,47 @@
+# [NMRiH] Shepherd
+
+This plugin adds commands to deal with situations where players are missing from a checkpoint that requires everyone to proceed.
+
+## Player Commands
+
+- `sm_missing [target]`: Shows who is missing from a checkpoint that requires everyone.
+  - `target` (optional): Username of a player in the checkpoint. Defaults to the command issuer or the spectated player.
+
+## Admin Commands
+
+- `sm_ultimatum [target] [time] [consequence]`: Forces all players to be in a required checkpoint within a time limit or face consequences. Players will see a chat message, and the checkpoint will be highlighted in red.
+  - `target` (optional): Username of a player in the checkpoint. Defaults to the command issuer or the spectated player.
+  - `time` (optional): Time limit in seconds. Defaults to `sm_shepherd_ultimate_default_seconds`.
+  - `consequence` (optional): Action on missing players:
+    - `tp`: Teleports the missing players to the required zone.
+    - `strip`: Teleports the missing players to the required zone without their inventory.
+    - `kill`: Kills the missing players instantly.
+    - Defaults to `sm_shepherd_ultimate_default_action`.
+
+- `sm_checkpoints`: Toggles displaying all mandatory checkpoints along with their IDs on the screen. This can help with [Automation](#Automation).
+
+## Automation
+
+The plugin can automatically issue ultimatums for certain checkpoints when they are reached for the first time. 
+To enable automation for a checkpoint, edit `addons/sourcemod/configs/shepherd_triggers.txt`. The config file has one line for each checkpoint with the following format:
+
+```
+[map name] [trigger id] [seconds] [consequence]
+```
+
+Examples: 
+```cpp
+// Kill players who aren't in the elevator after 1 minute
+nmo_ghostbuster 473061 60 kill 
+
+// Teleport lost players to the lift after 2 minutes
+nmo_ishimura_task_v3 865320 120 tp
+```
+
+## Installation
+
+To install this plugin, follow these steps:
+
+- Download the latest release from [here](https://github.com/dysphie/nmrih-shepherd/releases).
+- Extract the zip file and copy the contents to your `addons/sourcemod` folder.
+- Type `sm plugins load shepherd` in the console.
