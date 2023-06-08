@@ -1,4 +1,8 @@
-# [NMRiH] Shepherd
+<p align="center">
+  <img src="https://i.imgur.com/PExkibt.png" />
+</p>
+
+<h1 align="center">[NMRiH] Shepherd</h1>
 
 This plugin adds commands to deal with situations where players are missing from a checkpoint that requires everyone to proceed.
 
