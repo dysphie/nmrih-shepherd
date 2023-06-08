@@ -332,7 +332,7 @@ int GetCommandTarget(int issuer, int arg)
 
 Action Cmd_Ultimatum(int issuer, int args)
 {
-	int target = GetCommandTarget(issuer, 1);	 // todo fix issue with console
+	int target = GetCommandTarget(issuer, 1);
 	if (target == -1)
 	{
 		return Plugin_Handled;
@@ -522,7 +522,7 @@ void BeginUltimatum(int trigger, int activator, int seconds, TriggerAction type)
 
 	if (ultSound[0])
 	{
-		// TODO: EmitSoundToAll doesn't work properly with SOUND_FROM_PLAYER?
+		// EmitSoundToAll doesn't work properly with SOUND_FROM_PLAYER, loop manually
 		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (IsClientInGame(i))
