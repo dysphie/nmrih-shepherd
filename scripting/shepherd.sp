@@ -6,23 +6,26 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_PREFIX					   "[Shepherd] "
-#define MAX_EDICTS						   (1 << 11)
+#define PLUGIN_PREFIX	"[Shepherd] "
+#define MAX_EDICTS		(1 << 11)
 
-#define OBS_MODE_IN_EYE					   4
-#define OBS_MODE_CHASE					   5
-#define OBS_MODE_POI					   6
+#define OBS_MODE_IN_EYE 4
+#define OBS_MODE_CHASE	5
+#define OBS_MODE_POI	6
 
-bool   g_Touched[MAX_EDICTS + 1];
+#define NMR_MAXPLAYERS	9
 
-int	   offs_m_hTouchingEntities = -1;
-int	   g_LaserIndex;
-int	   g_HaloIndex;
+ArrayList g_PreviewingTriggers[NMR_MAXPLAYERS + 1];
+bool	  g_Touched[MAX_EDICTS + 1];
 
-ConVar cvHighlightTrigger;
-ConVar cvDefaultAction;
-ConVar cvDefaultSeconds;
-ConVar cvSound;
+int		  offs_m_hTouchingEntities = -1;
+int		  g_LaserIndex;
+int		  g_HaloIndex;
+
+ConVar	  cvHighlightTrigger;
+ConVar	  cvDefaultAction;
+ConVar	  cvDefaultSeconds;
+ConVar	  cvSound;
 
 public Plugin myinfo =
 {
@@ -57,10 +60,6 @@ enum struct AutoTrigger
 	int			  seconds;
 }
 
-#define NMR_MAXPLAYERS 9
-
-ArrayList g_PreviewingTriggers[NMR_MAXPLAYERS + 1];
-
 enum struct TriggerPreview
 {
 	float mins[3];
@@ -76,33 +75,35 @@ enum struct TriggerPreview
 
 public void OnPluginStart()
 {
-	g_AutoTriggers	= new ArrayList(sizeof(AutoTrigger));
-
-	cvSound			= CreateConVar("sm_shepherd_TriggerAction_sound", "ui/challenge_checkpoint.wav");
-
-	cvDefaultAction = CreateConVar("sm_shepherd_TriggerAction_defaTriggerAction_action", "tp",
-								   "Default action to take on missing players when no action type is specified via command." ... "tp = Teleport, kill = Kill, strip = Strip weapons and teleport");
-	cvDefaultAction.AddChangeHook(OnCvarDefaultActionChanged);
-
-	cvDefaultSeconds   = CreateConVar("sm_shepherd_TriggerAction_defaTriggerAction_seconds", "120",
-									  "Default waiting time, in seconds, for missing players when no duration is specified via command");
-
-	cvHighlightTrigger = CreateConVar("sm_shepherd_highlight_trigger", "1",
-									  "Whether to highlight relevant triggers");
-
 	LoadTranslations("shepherd.phrases");
 	GameData gamedata		 = new GameData("shepherd.games");
 	offs_m_hTouchingEntities = GetOffsetOrFail(gamedata, "CBaseTrigger::m_hTouchingEntities");
+	delete gamedata;
+
+	g_AutoTriggers	= new ArrayList(sizeof(AutoTrigger));
+
+	cvSound			= CreateConVar("sm_shepherd_ultimatum_sound", "ui/challenge_checkpoint.wav");
+
+	cvDefaultAction = CreateConVar("sm_shepherd_ultimatum_default_action", "tp",
+								   "Default action to take on missing players when no action type is specified via command." ... "tp = Teleport, kill = Kill, strip = Strip weapons and teleport");
+	cvDefaultAction.AddChangeHook(OnCvarDefaultActionChanged);
+
+	cvDefaultSeconds   = CreateConVar("sm_shepherd_ultimatum_default_seconds", "120",
+									  "Default waiting time, in seconds, for missing players when no duration is specified via command");
+
+	cvHighlightTrigger = CreateConVar("sm_shepherd_highlight_bounds", "1",
+									  "Whether to highlight the checkpoint's bounding box during ultimatums");
 
 	RegConsoleCmd("sm_missing", Cmd_Missing, "Displays the names of players who are absent from areas that require the whole team");
-	RegConsoleCmd("sm_quienfalta", Cmd_Missing, "Muestra los nombres de jugadores que están ausentes de áreas que requieren a todo el equipo");
 
 	RegAdminCmd("sm_ultimatum", Cmd_Ultimatum, ADMFLAG_SLAY);
 	RegAdminCmd("sm_ult", Cmd_Ultimatum, ADMFLAG_SLAY);
 
-	RegAdminCmd("sm_showtriggers", Cmd_PreviewMode, ADMFLAG_ROOT);
+	RegAdminCmd("sm_checkpoints", Cmd_PreviewMode, ADMFLAG_ROOT);
 
 	HookEntityOutput("trigger_allplayer", "OnStartTouch", OnStartTouch);
+
+	AutoExecConfig(true, "shepherd");
 }
 
 void OnCvarDefaultActionChanged(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -170,7 +171,7 @@ void LoadTriggersFromConfig()
 	char path[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, path, sizeof(path), "configs/shepherd_triggers.txt");
 
-	File f	   = OpenFile(path, "r");
+	File f = OpenFile(path, "r");
 	if (!f)
 	{
 		LogError("Failed to open %s", path);
@@ -184,9 +185,15 @@ void LoadTriggersFromConfig()
 	{
 		TrimString(line);
 
+		// Ignore empty space and comments
+		if (!line[0] || strncmp(line, "//", 2) == 0)
+		{
+			continue;
+		}
+
 		if (g_CfgRegex.Match(line) == -1)
 		{
-			PrintToServer("Unknown line: %s", line);
+			LogError("Invalid line: %s", line);
 			continue;
 		}
 
@@ -218,7 +225,7 @@ void LoadTriggersFromConfig()
 		count++;
 	}
 
-	PrintToServer(PLUGIN_PREFIX... "Loaded %d auto-triggers", count);
+	// LogMessage(PLUGIN_PREFIX... "Loaded %d auto-triggers", count);
 	delete f;
 	delete g_CfgRegex;
 }
@@ -312,7 +319,8 @@ int GetCommandTarget(int issuer, int arg)
 	{
 		target = FindTarget(issuer, cmdTarget);
 	}
-	else if (!issuer) {
+	else if (!issuer)
+	{
 		return -1;
 	}
 	else if (!IsPlayerAlive(issuer)) {
@@ -535,12 +543,12 @@ Action Timer_UltimatumThink(Handle timer, DataPack data)
 		return Plugin_Stop;
 	}
 
-	float		  endTime = data.ReadFloat();
-	TriggerAction type	  = data.ReadCell();
+	float		  endTime		= data.ReadFloat();
+	TriggerAction type			= data.ReadCell();
 
-	float curTime = GetGameTime();
+	float		  curTime		= GetGameTime();
 
-	float remainingTime = endTime - curTime;
+	float		  remainingTime = endTime - curTime;
 
 	if (remainingTime <= 0.0)
 	{
@@ -554,16 +562,18 @@ Action Timer_UltimatumThink(Handle timer, DataPack data)
 	float textPos[3];
 	GetEntityCenter(trigger, textPos);
 
-	char  humanTime[32];
+	char humanTime[32];
 	SecondsToHumanTime(RoundToFloor(remainingTime), humanTime, sizeof(humanTime));
 
 	DrawWorldTextAll(trigger, textPos, "%t", "Waiting for Players", humanTime);
 
-	HighlightTriggerToAll(trigger, 1.0);
+	if (cvHighlightTrigger.BoolValue)
+	{
+		HighlightTriggerToAll(trigger, 1.0);
+	}
 
 	return Plugin_Continue;
 }
-
 
 void SecondsToHumanTime(int seconds, char[] buffer, int maxlen)
 {
@@ -743,10 +753,9 @@ Action Cmd_Missing(int issuer, int args)
 	}
 
 	int trigger = FindTrigger(target);
-	if (!trigger)
+	if (trigger == -1)
 	{
-		ReplyNotInsideTrigger(issuer, target);
-		return Plugin_Handled;
+		return ReplyNotInsideTrigger(issuer, target);
 	}
 
 	PrintMissing(issuer, trigger);
@@ -852,6 +861,8 @@ Action Cmd_PreviewMode(int client, int args)
 
 void BeginPreviewMode(int client)
 {
+	delete g_PreviewingTriggers[client];
+
 	g_PreviewingTriggers[client] = new ArrayList(sizeof(TriggerPreview));
 
 	// Take a snapshot of current trigger_allplayer entities
@@ -877,7 +888,6 @@ void BeginPreviewMode(int client)
 	}
 
 	CreateTimer(1.0, PreviewModeThink, GetClientSerial(client), TIMER_REPEAT);
-
 
 	CReplyToCommand(client, "%t", "Enabled Trigger Preview");
 }
@@ -907,7 +917,8 @@ Action PreviewModeThink(Handle timer, int clientSerial)
 		return Plugin_Stop;
 	}
 
-	if (!g_PreviewingTriggers[client]) {
+	if (!g_PreviewingTriggers[client])
+	{
 		return Plugin_Stop;
 	}
 
@@ -956,15 +967,16 @@ void TE_Box(int client, float mins[3], float maxs[3], int r, int g, int b, float
 	}
 }
 
-void RandomReadableColor(int& r, int &g, int& b)
+void RandomReadableColor(int& r, int& g, int& b)
 {
 	float h = GetRandomFloat(0.0, 360.0);
-  	float s = 1.0;
-  	float l = 0.5;
+	float s = 1.0;
+	float l = 0.5;
 	HSLToRGB(h, s, l, r, g, b);
 }
 
- float HueToRGB(float v1, float v2, float vH) {
+float HueToRGB(float v1, float v2, float vH)
+{
 	if (vH < 0)
 		vH += 1;
 
@@ -983,7 +995,7 @@ void RandomReadableColor(int& r, int &g, int& b)
 	return v1;
 }
 
-void HSLToRGB(float h, float s, float l, int& r, int& g, int &b)
+void HSLToRGB(float h, float s, float l, int& r, int& g, int& b)
 {
 	if (s == 0)
 	{
@@ -994,12 +1006,12 @@ void HSLToRGB(float h, float s, float l, int& r, int& g, int &b)
 		float v1, v2;
 		float hue = h / 360.0;
 
-		v2 = (l < 0.5) ? (l * (1 + s)) : ((l + s) - (l * s));
-		v1 = 2 * l - v2;
+		v2		  = (l < 0.5) ? (l * (1 + s)) : ((l + s) - (l * s));
+		v1		  = 2 * l - v2;
 
-		r = RoundToFloor(255 * HueToRGB(v1, v2, hue + (1.0 / 3)));
-		g = RoundToFloor(255 * HueToRGB(v1, v2, hue));
-		b = RoundToFloor(255 * HueToRGB(v1, v2, hue - (1.0 / 3)));
+		r		  = RoundToFloor(255 * HueToRGB(v1, v2, hue + (1.0 / 3)));
+		g		  = RoundToFloor(255 * HueToRGB(v1, v2, hue));
+		b		  = RoundToFloor(255 * HueToRGB(v1, v2, hue - (1.0 / 3)));
 	}
 }
 

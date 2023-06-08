@@ -5,29 +5,31 @@
         "en"    "Trigger visualization {red}disabled"
         "es"    "Visualización de triggers {red}desactivada"
     }
+
     "Enabled Trigger Preview"
     {
         "en"    "Trigger visualization {green}enabled"
         "es"    "Visualización de triggers {green}activada"
     }
-    "You are not in a Trigger"
+
+    "Not Inside Trigger, Second Person"
     {
         "en"    "You are not in an area that requires other players."
         "es"    "No te encuentras en un área que requiera a todo el equipo."
     }
 
-    "Player is not in a Trigger"
+    "Not Inside Trigger, Third Person"
     {
         "#format"    "{1:N}"
         "en"         "{1} is not in an area that requires other players."
         "es"         "{1} no está en un área que requiera a todo el equipo."
     }
 
-    "Everyone Must Go"
+    "Must be at Marked Location"
     {
         "#format"    "{1:s},{2:t}"
-        "en"         "Everyone must be at the marked location in {1}. Those left behind will be {2}"
-        "es"         "Todos deben estar en la ubicación marcada en {1}. Aquellos que no lo logren serán {2}."
+        "en"         "{salmon}Everyone must be at the marked location in {red}{1}{salmon}. Those left behind will be {red}{2}{salmon}."
+        "es"         "{salmon}Todos deben estar en la ubicación marcada en {red}{1}{salmon}. Aquellos que no lo logren serán {red}{2}{salmon}."
     }
 
     "Waiting for Players"
@@ -47,8 +49,8 @@
     "You Were Acted Upon"
     {
         "#format"    "{1:t}"
-        "en"         "You've been {1} for failing to show up at the required location in time"
-        "es"         "Has sido {1} por no ir a la ubicación requerida a tiempo"
+        "en"         "{salmon}You've been {red}{1}{salmon} for failing to show up at the required location in time"
+        "es"         "{salmon}Has sido {red}{1}{salmon} por no ir a la ubicación requerida a tiempo"
     }
 
     "Teleported and Stripped, Third Person"
