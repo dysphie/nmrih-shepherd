@@ -1,29 +1,39 @@
 "Phrases"
 {
-    "Not Inside Trigger, Second Person"
+    "Disabled Trigger Preview"
+    {
+        "en"    "Trigger visualization {red}disabled"
+        "es"    "Visualización de triggers {red}desactivada"
+    }
+    "Enabled Trigger Preview"
+    {
+        "en"    "Trigger visualization {green}enabled"
+        "es"    "Visualización de triggers {green}activada"
+    }
+    "You are not in a Trigger"
     {
         "en"    "You are not in an area that requires other players."
-        "es"    "No estás en un área que requiera a todo el equipo."
+        "es"    "No te encuentras en un área que requiera a todo el equipo."
     }
 
-    "Not Inside Trigger, Third Person"
+    "Player is not in a Trigger"
     {
         "#format"    "{1:N}"
         "en"         "{1} is not in an area that requires other players."
         "es"         "{1} no está en un área que requiera a todo el equipo."
     }
 
-    "Must be at Marked Location"
+    "Everyone Must Go"
     {
         "#format"    "{1:s},{2:t}"
-        "en"         "Everyone must be at the marked location in {1}. Those who fail to do so will be {2}"
+        "en"         "Everyone must be at the marked location in {1}. Those left behind will be {2}"
         "es"         "Todos deben estar en la ubicación marcada en {1}. Aquellos que no lo logren serán {2}."
     }
 
     "Waiting for Players"
     {
         "#format"    "{1:s}"
-        "en"         "[{1}] Waiting for players"
+        "en"         "[{1}] Waiting for everyone"
         "es"         "[{1}] Esperando al equipo"
     }
 
