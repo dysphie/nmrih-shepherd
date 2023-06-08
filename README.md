@@ -30,7 +30,7 @@ ConVars can be configured in `cfg/sourcemod/shepherd.cfg`:
 
 - `sm_shepherd_ultimatum_default_seconds`: Specifies the default waiting time, in seconds, for missing players when no duration is specified via a command. Defaults to `120` seconds.
 
-- `sm_shepherd_highlight_checkpoints`: Determines whether to highlight checkpoints during ultimatums. Defaults to `1` (enabled).
+- `sm_shepherd_highlight_bounds`: Whether to display the checkpoint's bounding box when highlighted. Defaults to `1` (enabled).
 
 ## Automation
 
