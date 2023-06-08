@@ -158,15 +158,6 @@ int GetEntityHammerID(int entity)
 	return GetEntProp(entity, Prop_Data, "m_iHammerID");
 }
 
-// int RandomReadableColor(int& hue, int &saturation, int& lightness)
-// {
-// 	int hue = GetRandomInt(0, 360);
-//   	int saturation = 100;
-//   	int lightness = 50;
-
-// 	// Convert to RGB
-// }
-
 void LoadTriggersFromConfig()
 {
 	Regex g_CfgRegex = new Regex("(\\w+)\\s+(\\d+)\\s+(\\d+)\\s+(tp|kill|strip|default)");
@@ -180,6 +171,11 @@ void LoadTriggersFromConfig()
 	BuildPath(Path_SM, path, sizeof(path), "configs/shepherd_triggers.txt");
 
 	File f	   = OpenFile(path, "r");
+	if (!f)
+	{
+		LogError("Failed to open %s", path);
+		return;
+	}
 
 	int	 count = 0;
 
@@ -835,7 +831,7 @@ void TE_SendBeam(int client, const float mins[3], const float maxs[3], float dur
 	rgba[0] = r;
 	rgba[1] = g;
 	rgba[2] = b;
-	rgba[3] = 255;
+	rgba[3] = 100;
 
 	TE_SetupBeamPoints(mins, maxs, g_LaserIndex, g_HaloIndex, 0, 0, duration, 1.0, 1.0, 1, 0.0, rgba, 0);
 	TE_SendToClient(client);
@@ -875,15 +871,15 @@ void BeginPreviewMode(int client)
 		backup.hammerID		 = GetEntityHammerID(trigger);
 		backup.possibleIndex = trigger;
 
-		// TODO: Use a better color space to ensure readable colors
-		backup.r			 = GetRandomInt(0, 255);
-		backup.g			 = GetRandomInt(0, 255);
-		backup.b			 = GetRandomInt(0, 255);
+		RandomReadableColor(backup.r, backup.g, backup.b);
 
 		g_PreviewingTriggers[client].PushArray(backup);
 	}
 
-	CreateTimer(0.1, PreviewModeThink, GetClientSerial(client), TIMER_REPEAT);
+	CreateTimer(1.0, PreviewModeThink, GetClientSerial(client), TIMER_REPEAT);
+
+
+	CReplyToCommand(client, "%t", "Enabled Trigger Preview");
 }
 
 void EndPreviewMode(int client)
@@ -898,6 +894,8 @@ void EndPreviewMode(int client)
 	}
 
 	delete g_PreviewingTriggers[client];
+
+	CReplyToCommand(client, "%t", "Disabled Trigger Preview");
 }
 
 Action PreviewModeThink(Handle timer, int clientSerial)
@@ -909,7 +907,11 @@ Action PreviewModeThink(Handle timer, int clientSerial)
 		return Plugin_Stop;
 	}
 
-	float duration = 0.2;
+	if (!g_PreviewingTriggers[client]) {
+		return Plugin_Stop;
+	}
+
+	float duration = 1.0;
 
 	float clientPos[3];
 	GetClientEyePosition(client, clientPos);
@@ -950,6 +952,64 @@ void TE_Box(int client, float mins[3], float maxs[3], int r, int g, int b, float
 			adjacent	= vertex;
 			adjacent[j] = (vertex[j] == maxs[j]) ? mins[j] : maxs[j];
 			TE_SendBeam(client, vertex, adjacent, duration, r, g, b);
+		}
+	}
+}
+
+void RandomReadableColor(int& r, int &g, int& b)
+{
+	float h = GetRandomFloat(0.0, 360.0);
+  	float s = 1.0;
+  	float l = 0.5;
+	HSLToRGB(h, s, l, r, g, b);
+}
+
+ float HueToRGB(float v1, float v2, float vH) {
+	if (vH < 0)
+		vH += 1;
+
+	if (vH > 1)
+		vH -= 1;
+
+	if ((6 * vH) < 1)
+		return (v1 + (v2 - v1) * 6 * vH);
+
+	if ((2 * vH) < 1)
+		return v2;
+
+	if ((3 * vH) < 2)
+		return (v1 + (v2 - v1) * ((2.0 / 3) - vH) * 6);
+
+	return v1;
+}
+
+void HSLToRGB(float h, float s, float l, int& r, int& g, int &b)
+{
+	if (s == 0)
+	{
+		r = g = b = RoundToFloor(l * 255);
+	}
+	else
+	{
+		float v1, v2;
+		float hue = h / 360.0;
+
+		v2 = (l < 0.5) ? (l * (1 + s)) : ((l + s) - (l * s));
+		v1 = 2 * l - v2;
+
+		r = RoundToFloor(255 * HueToRGB(v1, v2, hue + (1.0 / 3)));
+		g = RoundToFloor(255 * HueToRGB(v1, v2, hue));
+		b = RoundToFloor(255 * HueToRGB(v1, v2, hue - (1.0 / 3)));
+	}
+}
+
+public void OnPluginEnd()
+{
+	for (int i = 1; i <= MaxClients; i++)
+	{
+		if (g_PreviewingTriggers[i] && IsClientInGame(i))
+		{
+			EndPreviewMode(i);
 		}
 	}
 }
