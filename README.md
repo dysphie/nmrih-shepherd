@@ -60,4 +60,5 @@ To install this plugin, follow these steps:
 
 - Download the latest release from [here](https://github.com/dysphie/nmrih-shepherd/releases).
 - Extract the zip file and copy the contents to your `addons/sourcemod` folder.
-- Type `sm plugins load shepherd` in the console.
+- Load the plugin: `sm plugins load shepherd` in the console.
+- Reload translations: `sm_reload_translations` in the console.
