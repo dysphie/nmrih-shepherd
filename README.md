@@ -1,4 +1,8 @@
-# [NMRiH] Shepherd
+<p align="center">
+  <img src="https://i.imgur.com/PExkibt.png" />
+</p>
+
+<h1 align="center">[NMRiH] Shepherd</h1>
 
 This plugin adds commands to deal with situations where players are missing from a checkpoint that requires everyone to proceed.
 
@@ -9,10 +13,10 @@ This plugin adds commands to deal with situations where players are missing from
 
 ## Admin Commands
 
-- `sm_ultimatum [target] [time] [consequence]`: Forces all players to be in a required checkpoint within a time limit or face consequences. Players will see a chat message, and the checkpoint will be highlighted in red.
+- `sm_ultimatum [target] [time] [action]`: Forces all players to be in a required checkpoint within a time limit or face consequences. Players will see a chat message, and the checkpoint will be highlighted in red.
   - `target` (optional): Username of a player in the checkpoint. Defaults to the command issuer or the spectated player.
   - `time` (optional): Time limit in seconds. Defaults to `sm_shepherd_ultimate_default_seconds`.
-  - `consequence` (optional): Action on missing players:
+  - `action` (optional): Action to take on missing players:
     - `tp`: Teleports the missing players to the required zone.
     - `strip`: Teleports the missing players to the required zone without their inventory.
     - `kill`: Kills the missing players instantly.
@@ -38,7 +42,7 @@ The plugin can automatically issue ultimatums for certain checkpoints when they 
 To enable automation for a checkpoint, edit `addons/sourcemod/configs/shepherd_triggers.txt`. The config file has one line for each checkpoint with the following format:
 
 ```
-[map name] [trigger id] [seconds] [consequence]
+[map name] [trigger id] [seconds] [action]
 ```
 
 Examples: 
@@ -56,4 +60,5 @@ To install this plugin, follow these steps:
 
 - Download the latest release from [here](https://github.com/dysphie/nmrih-shepherd/releases).
 - Extract the zip file and copy the contents to your `addons/sourcemod` folder.
-- Type `sm plugins load shepherd` in the console.
+- Load the plugin: `sm plugins load shepherd` in the console.
+- Reload translations: `sm_reload_translations` in the console.
