@@ -139,7 +139,6 @@ void OnStartTouch(const char[] output, int trigger, int activator, float delay)
 {
 	if (!IsEntityPlayer(activator) || g_Touched[trigger] || GetAliveCount() < 2)
 	{
-		PrintToServer("g_Touched[trigger] || GetAliveCount() < 2");
 		return;
 	}
 
