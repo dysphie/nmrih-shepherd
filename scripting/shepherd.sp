@@ -8,7 +8,7 @@
 
 #define PLUGIN_PREFIX	"[Shepherd] "
 #define PLUGIN_DESCRIPTION "Helps round progression by tracking and managing missing players"
-#define PLUGIN_VERSION "1.0.0"
+#define PLUGIN_VERSION "1.0.1"
 
 #define MAX_EDICTS		(1 << 11)
 
@@ -519,7 +519,7 @@ void BeginUltimatum(int trigger, int activator, int seconds, TriggerAction type)
 
 	float textPos[3];
 	GetEntityCenter(trigger, textPos);
-	DrawWorldTextAll(trigger, textPos, "%t", "Waiting for Players", humanTime);
+	DrawWorldTextAll(-1, textPos, "%t", "Waiting for Players", humanTime);
 	HighlightTriggerToAll(trigger, 1.0);
 
 	char ultSound[PLATFORM_MAX_PATH];
@@ -544,7 +544,8 @@ Action Timer_UltimatumThink(Handle timer, DataPack data)
 
 	int trigger = EntRefToEntIndex(data.ReadCell());
 	if (!IsValidEntity(trigger))
-	{
+	{	
+		RemoveWorldTextAll(-1);
 		return Plugin_Stop;
 	}
 
@@ -570,7 +571,7 @@ Action Timer_UltimatumThink(Handle timer, DataPack data)
 	char humanTime[32];
 	SecondsToHumanTime(RoundToFloor(remainingTime), humanTime, sizeof(humanTime));
 
-	DrawWorldTextAll(trigger, textPos, "%t", "Waiting for Players", humanTime);
+	DrawWorldTextAll(-1, textPos, "%t", "Waiting for Players", humanTime);
 
 	if (cvHighlightTrigger.BoolValue)
 	{
@@ -579,6 +580,7 @@ Action Timer_UltimatumThink(Handle timer, DataPack data)
 
 	return Plugin_Continue;
 }
+
 
 void SecondsToHumanTime(int seconds, char[] buffer, int maxlen)
 {
@@ -620,7 +622,7 @@ void UltimatumFinish(int trigger, TriggerAction action, float teleportPos[3])
 		}
 	}
 
-	RemoveWorldTextAll(trigger);
+	RemoveWorldTextAll(-1);
 }
 
 void DropAllWeapons(int client)
@@ -739,16 +741,6 @@ int GetPlayersInTrigger(int trigger, int players[NMR_MAXPLAYERS])
 	return numPlayers;
 }
 
-public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs)
-{
-	if (client && StrEqual(sArgs, "quien falta", false))
-	{
-		ClientCommand(client, "sm_missing");
-	}
-
-	return Plugin_Continue;
-}
-
 Action Cmd_Missing(int issuer, int args)
 {
 	int target = GetCommandTarget(issuer, 1);
@@ -796,7 +788,7 @@ void AnnounceMissing(int issuer, int missing[NMR_MAXPLAYERS], int numMissing)
 			Format(buffer, sizeof(buffer), "%N", teammate);
 		}
 		else {
-			Format(buffer, sizeof(buffer), "%N, %N", buffer, teammate);
+			Format(buffer, sizeof(buffer), "%s, %N", buffer, teammate);
 		}
 	}
 
