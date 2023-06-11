@@ -8,7 +8,7 @@
 
 #define PLUGIN_PREFIX	"[Shepherd] "
 #define PLUGIN_DESCRIPTION "Helps round progression by tracking and managing missing players"
-#define PLUGIN_VERSION "1.0.1"
+#define PLUGIN_VERSION "1.0.2"
 
 #define MAX_EDICTS		(1 << 11)
 
@@ -731,7 +731,7 @@ int GetPlayersInTrigger(int trigger, int players[NMR_MAXPLAYERS])
 	// Get all the clients touching this trigger
 	for (int i = 0; i < maxEnts; i++)
 	{
-		int touching = LoadEntityFromHandleAddress(elements + view_as<Address>(i * 0x4));	 // The first thingy being stored
+		int touching = LoadEntityHandleFromAddress2(elements + view_as<Address>(i * 0x4));	 // The first thingy being stored
 		if (IsEntityPlayer(touching))
 		{
 			players[numPlayers++] = touching;
@@ -739,6 +739,12 @@ int GetPlayersInTrigger(int trigger, int players[NMR_MAXPLAYERS])
 	}
 
 	return numPlayers;
+}
+
+// replacement for LoadEntityHandleFromAddress which is sm 1.12 only
+// warning: disgusting  -nosoop
+int LoadEntityHandleFromAddress2(Address addr) {
+	return EntRefToEntIndex(LoadFromAddress(addr, NumberType_Int32) | (1 << 31));
 }
 
 Action Cmd_Missing(int issuer, int args)
