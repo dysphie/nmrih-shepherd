@@ -38,7 +38,7 @@ ConVars can be configured in `cfg/sourcemod/shepherd.cfg`:
 
 ## Automation
 
-The plugin can automatically issue ultimatums for certain checkpoints when they are reached for the first time. 
+The plugin can automatically issue ultimatums for certain checkpoints when they are touched by a player for the first time. 
 To enable automation for a checkpoint, edit `addons/sourcemod/configs/shepherd_triggers.txt`. The config file has one line for each checkpoint with the following format:
 
 ```
