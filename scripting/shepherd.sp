@@ -8,7 +8,7 @@
 
 #define PLUGIN_PREFIX	"[Shepherd] "
 #define PLUGIN_DESCRIPTION "Helps round progression by tracking and managing missing players"
-#define PLUGIN_VERSION "1.0.2"
+#define PLUGIN_VERSION "1.0.3"
 
 #define MAX_EDICTS		(1 << 11)
 
@@ -78,6 +78,7 @@ enum struct TriggerPreview
 
 public void OnPluginStart()
 {
+	LoadTranslations("common.phrases");
 	LoadTranslations("shepherd.phrases");
 	GameData gamedata		 = new GameData("shepherd.games");
 	offs_m_hTouchingEntities = GetOffsetOrFail(gamedata, "CBaseTrigger::m_hTouchingEntities");
