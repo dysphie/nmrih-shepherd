@@ -8,7 +8,7 @@
 
 #define PLUGIN_PREFIX	"[Shepherd] "
 #define PLUGIN_DESCRIPTION "Helps round progression by tracking and managing missing players"
-#define PLUGIN_VERSION "1.0.2"
+#define PLUGIN_VERSION "1.0.3"
 
 #define MAX_EDICTS		(1 << 11)
 
@@ -78,7 +78,9 @@ enum struct TriggerPreview
 
 public void OnPluginStart()
 {
+	LoadTranslations("common.phrases");
 	LoadTranslations("shepherd.phrases");
+
 	GameData gamedata		 = new GameData("shepherd.games");
 	offs_m_hTouchingEntities = GetOffsetOrFail(gamedata, "CBaseTrigger::m_hTouchingEntities");
 	delete gamedata;
@@ -710,7 +712,7 @@ int GetPlayersInTrigger(int trigger, int players[NMR_MAXPLAYERS])
 
 	if (!m_hTouchingEntities)
 	{
-		LogError("CBaseTrigger::m_hTouchingEntities is null");
+		// LogError("CBaseTrigger::m_hTouchingEntities is null");
 		return 0;
 	}
 
@@ -724,7 +726,7 @@ int GetPlayersInTrigger(int trigger, int players[NMR_MAXPLAYERS])
 	Address elements = LoadFromAddress(m_hTouchingEntities + view_as<Address>(0x10), NumberType_Int32);	   // UtlVector::m_pElements
 	if (!elements)
 	{
-		LogError("CBaseTrigger::m_hTouchingEntities::m_pElements is null");
+		// LogError("CBaseTrigger::m_hTouchingEntities::m_pElements is null");
 		return 0;
 	}
 
