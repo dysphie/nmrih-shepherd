@@ -1,3 +1,6 @@
+> [!WARNING]
+> This plugin is unmaintained since Torn Banner's acquisition of the game.
+
 <p align="center">
   <img src="https://i.imgur.com/PExkibt.png" />
 </p>
